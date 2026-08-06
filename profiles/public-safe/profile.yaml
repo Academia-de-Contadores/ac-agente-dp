@@ -1,0 +1,8 @@
+schema_version: 1
+name: public-safe
+canonical_agent_version: 0.1.0
+purpose: Distribuição pública com orientação geral, checklist e encaminhamento para revisão humana.
+restrictions:
+  - Não realizar cálculo ou apuração final.
+  - Não assinar, protocolar ou transmitir documentos, obrigações ou declarações.
+  - Não tomar decisão individual ou regulatória definitiva.
