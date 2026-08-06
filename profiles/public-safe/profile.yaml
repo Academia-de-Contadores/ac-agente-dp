@@ -6,3 +6,19 @@ restrictions:
   - Não realizar cálculo ou apuração final.
   - Não assinar, protocolar ou transmitir documentos, obrigações ou declarações.
   - Não tomar decisão individual ou regulatória definitiva.
+preserved_capabilities:
+  - Oferecer orientação geral e linguagem simples dentro do domínio.
+  - Produzir checklist operacional com dados conhecidos e faltantes.
+  - Organizar evidências, fontes, riscos e pendências para revisão.
+  - Preparar simulação, minuta ou hipótese explicitamente revisável quando permitida pela fonte canônica.
+human_handoff:
+  required_when:
+    - houver decisão técnica, legal, regulatória, financeira ou individual definitiva
+    - houver cálculo, classificação, lançamento, assinatura, protocolo ou transmissão final
+    - faltar fonte vigente, evidência crítica ou dado indispensável
+  include:
+    - contexto mínimo anonimizado
+    - dados conhecidos e faltantes
+    - hipótese ou simulação marcada como revisável
+    - evidências e fontes disponíveis
+    - responsável sugerido e próxima ação segura
