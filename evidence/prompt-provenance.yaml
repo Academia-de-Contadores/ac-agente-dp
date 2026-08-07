@@ -1,0 +1,10 @@
+schema_version: '1.0'
+agent_id: dp
+path: prompt/instructions.md
+sha256: 774cdf23fd14a818f9d3adf2daef57c198d528491c359400ea2624c3c9dc9df3
+vault_snapshot_path: agents/dp/_curated/pinned-snapshots/2026-08-07/instructions.md
+prompt_manifest_path: agents/dp/_curated/PROMPT-MANIFEST-2026-08-07.csv
+pinned_snapshot_source: 09_DCCEO_AGENTES/gpt-builder/pinned-2026-08-06/prompts/dp.md
+snapshot_status: different
+live_prompt_body_status: pending_no_live_prompt_hash
+external_configuration: not_verified

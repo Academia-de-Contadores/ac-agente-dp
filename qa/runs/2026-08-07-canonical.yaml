@@ -1,0 +1,7 @@
+schema_version: '1.0'
+profile: canonical
+status: pass_local_structure_and_guardrails
+technical_final_decision: not_performed
+protocol_execution: not_performed
+configured_external: not_verified
+e2e_pass: not_verified
