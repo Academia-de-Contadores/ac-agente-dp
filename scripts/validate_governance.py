@@ -140,7 +140,9 @@ def safe_relative_path(raw_path: object) -> PurePosixPath:
     return relative
 
 
-def validate_text_content(path: Path, relative: PurePosixPath, allowed_extensions: set[str]) -> bytes:
+def validate_text_content(
+    path: Path, relative: PurePosixPath, allowed_extensions: set[str], *, public_safe: bool = True
+) -> bytes:
     if path.suffix.lower() not in allowed_extensions:
         reject("FORBIDDEN_EXTENSION", relative.as_posix())
     try:
@@ -153,16 +155,29 @@ def validate_text_content(path: Path, relative: PurePosixPath, allowed_extension
         text = content.decode("utf-8")
     except UnicodeDecodeError:
         reject("BINARY_CONTENT", relative.as_posix())
-    if re.search(r"(?i)(?:OPENAI_API_KEY\s*=\s*|\bsk-(?:proj-)?)[A-Za-z0-9_-]{16,}", text):
-        reject("SECRET_DETECTED", relative.as_posix())
-    if re.search(r"\b\d{3}\.\d{3}\.\d{3}-\d{2}\b", text) or re.search(
-        r"\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b", text, re.IGNORECASE
-    ):
-        reject("PII_DETECTED", relative.as_posix())
+    if public_safe:
+        if re.search(r"(?i)(?:OPENAI_API_KEY\s*=\s*|\bsk-(?:proj-)?)[A-Za-z0-9_-]{16,}", text):
+            reject("SECRET_DETECTED", relative.as_posix())
+        if re.search(r"\b\d{3}\.\d{3}\.\d{3}-\d{2}\b", text) or re.search(
+            r"\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b", text, re.IGNORECASE
+        ):
+            reject("PII_DETECTED", relative.as_posix())
+        if re.search(
+            r"(?i)\b(?:eu|n[oó]s|o agente)\s+(?:vou|iremos|vai)\s+"
+            r"(?:protocolar|transmitir|assinar)(?:\s+automaticamente)?\b",
+            text,
+        ):
+            reject("PROHIBITED_OPERATION_CLAIM", relative.as_posix())
+        if re.search(
+            r"(?i)\b(?:eu|n[oó]s|o agente)\s+garant(?:o|imos|e)\s+"
+            r"(?:economia|resultado|aprova[cç][aã]o|deferimento|conformidade)\b",
+            text,
+        ):
+            reject("SENSITIVE_RESULT_CLAIM", relative.as_posix())
     return content
 
 
-def validate_agent_repository(root: Path) -> None:
+def validate_agent_repository(root: Path, profile: str | None = None) -> None:
     root = root.resolve()
     validate_package_tree(root)
     agent_path = root / "agent.yaml"
@@ -195,8 +210,13 @@ def validate_agent_repository(root: Path) -> None:
         reject("INVALID_PROMPT_PATH", repr(prompt_path))
     prompt = root / prompt_path
     require_file(prompt, "PROMPT_MISSING")
-    prompt_content = validate_text_content(prompt, PurePosixPath(prompt_path), allowed_extensions)
+    public_safe = profile != "canonical"
+    prompt_content = validate_text_content(
+        prompt, PurePosixPath(prompt_path), allowed_extensions, public_safe=public_safe
+    )
     prompt_provenance_path = root / "evidence" / "prompt-provenance.yaml"
+    if profile and not prompt_provenance_path.is_file():
+        reject("PROMPT_PROVENANCE_MISSING", str(prompt_provenance_path))
     if prompt_provenance_path.exists():
         prompt_provenance = load_document(prompt_provenance_path)
         if prompt_provenance.get("agent_id") != agent_id:
@@ -231,7 +251,7 @@ def validate_agent_repository(root: Path) -> None:
             for filename in sorted(filenames):
                 path = Path(current) / filename
                 relative = PurePosixPath(path.relative_to(root).as_posix())
-                validate_text_content(path, relative, allowed_extensions)
+                validate_text_content(path, relative, allowed_extensions, public_safe=public_safe)
                 actual_files.add(relative)
 
     seen_paths: set[PurePosixPath] = set()
@@ -270,7 +290,9 @@ def validate_agent_repository(root: Path) -> None:
         expected_directory = "upload" if role == "upload_active" else "source"
         if relative.parts[1] != expected_directory:
             reject("ROLE_DIRECTORY_MISMATCH", relative.as_posix())
-        content = validate_text_content(root.joinpath(*relative.parts), relative, allowed_extensions)
+        content = validate_text_content(
+            root.joinpath(*relative.parts), relative, allowed_extensions, public_safe=public_safe
+        )
         expected_hash = entry.get("sha256")
         if not isinstance(expected_hash, str) or not SHA256.fullmatch(expected_hash):
             reject("INVALID_HASH", relative.as_posix())
@@ -281,6 +303,23 @@ def validate_agent_repository(root: Path) -> None:
             actual_uploads += 1
     if actual_uploads != active_upload:
         reject("UPLOAD_COUNT_MISMATCH", f"declared={active_upload} actual={actual_uploads}")
+
+    if profile:
+        provenance_path = root / "evidence" / "provenance.csv"
+        require_file(provenance_path, "PROVENANCE_MISSING")
+        with provenance_path.open(newline="", encoding="utf-8") as handle:
+            provenance_rows = list(csv.DictReader(handle))
+        expected_provenance = {
+            (entry["path"], entry["role"], entry["sha256"]) for entry in files
+        }
+        actual_provenance = {
+            (row.get("path"), row.get("role"), row.get("sha256")) for row in provenance_rows
+        }
+        if len(provenance_rows) != len(actual_provenance) or actual_provenance != expected_provenance:
+            reject(
+                "PROVENANCE_COVERAGE_MISMATCH",
+                f"expected={len(expected_provenance)} actual={len(actual_provenance)} rows={len(provenance_rows)}",
+            )
 
     for state in EXTERNAL_STATES:
         if evidence.get(state) != "not_verified":
@@ -406,7 +445,7 @@ def main() -> int:
             validate_levy_matrix(args.levy_matrix, args.root.resolve())
             print("LEVY_VALIDATION_OK")
         else:
-            validate_agent_repository(args.root)
+            validate_agent_repository(args.root, args.profile)
             if args.profile:
                 print(f"PROFILE_VALIDATION_OK profile={args.profile}")
     except ValidationFailure as exc:
