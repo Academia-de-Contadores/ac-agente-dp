@@ -393,6 +393,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("root", type=Path, help="central or agent repository root")
     parser.add_argument("--central", action="store_true", help="validate central governance contracts")
     parser.add_argument("--levy-matrix", type=Path, help="override the Levy matrix path")
+    parser.add_argument("--profile", choices=("canonical", "public-safe"), help="record the local validation profile")
     return parser.parse_args()
 
 
@@ -406,6 +407,8 @@ def main() -> int:
             print("LEVY_VALIDATION_OK")
         else:
             validate_agent_repository(args.root)
+            if args.profile:
+                print(f"PROFILE_VALIDATION_OK profile={args.profile}")
     except ValidationFailure as exc:
         print(f"{exc.code}: {exc.detail}")
         return 1

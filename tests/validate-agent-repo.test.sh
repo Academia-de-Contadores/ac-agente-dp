@@ -2,6 +2,8 @@
 set -euo pipefail
 root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 bash "$root/scripts/validate-agent-repo.sh"
+python3 "$root/scripts/validate_governance.py" "$root" --profile canonical
+python3 "$root/scripts/validate_governance.py" "$root" --profile public-safe
 tmp="$(mktemp -d)"
 trap 'rm -rf "$tmp"' EXIT
 cp -R "$root/." "$tmp/repo"
