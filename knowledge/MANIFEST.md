@@ -2,7 +2,8 @@
 
 - **GPT:** `ac.dp`
 - **Editor:** https://chatgpt.com/gpts/editor/g-6a725829fc9c8191a652858f5980d4f4
-- **Captura integral:** 2026-08-07
+- **Captura binária integral:** 2026-08-07
+- **Presença nominal reconfirmada no editor:** 2026-09-21 (16/16)
 - **Arquivos preservados:** 16/16
 - **Método:** download direto de cada anexo no editor autenticado do GPT Builder.
 
@@ -25,4 +26,8 @@
 | `original/06-ESOCIAL-SST-E-OBRIGACOES.md` | `a815516d630ea92da5270d0ce753fc1dfc8e22e5b7c2da293879fb160aaccb0c` | 4463 |
 | `original/99-FONTES-LACUNAS-E-CONTROLE-DE-VERSAO.md` | `05374b6ce9247236d4eb62a9c216193b585e6169ec7fe2d94670da8eaf4bc71a` | 4115 |
 
-Os arquivos foram copiados byte a byte com o mesmo nome exibido no GPT. Os hashes acima são a referência canônica para restauração e auditoria.
+Os arquivos foram copiados byte a byte em 2026-08-07 com o mesmo nome exibido
+no GPT. Os hashes acima são a referência canônica para restauração e auditoria.
+Em 2026-09-21, os 16 nomes foram reconfirmados no editor autenticado, mas os
+binários não foram baixados novamente; por isso a paridade de nomes é `MATCH`
+e a paridade binária com o estado online atual permanece `GAP`.

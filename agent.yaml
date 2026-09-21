@@ -2,8 +2,8 @@ schema_version: 1
 agent:
   id: ac.dp
   name: Agente DP Oficial
-  version: 0.1.0
-  lifecycle: source-capture
+  version: 0.2.0
+  lifecycle: candidate
   owners:
     - Academia-de-Contadores
 catalog:
@@ -11,8 +11,11 @@ catalog:
 source_capture:
   status: accessible
   captured_at: 2026-08-06
+  last_verified_at: 2026-09-21
+  knowledge_binary_captured_at: 2026-08-07
   source_url: https://chatgpt.com/gpts/editor/g-6a725829fc9c8191a652858f5980d4f4
   record: evaluations/source-capture.md
+  current_audit: evaluations/live-editor-audit-2026-09-21.md
 objectives:
   mission: objectives/mission.md
   metrics: objectives/success-metrics.md
@@ -23,10 +26,73 @@ identity:
 instructions:
   system: instructions/system.md
   guardrails: instructions/guardrails.md
-skills: []
+skills:
+  - id: ac-dp
+    entrypoint: SKILL.md
+    interface: agents/openai.yaml
+    references:
+      - references/source-policy.md
+      - references/dp-outputs.md
+      - references/approval-policy.md
+skill_runtime:
+  name: ac-dp
+  entrypoint: SKILL.md
+  interface: agents/openai.yaml
+  source_policy: references/source-policy.md
+  dp_outputs: references/dp-outputs.md
+  approval_policy: references/approval-policy.md
+  knowledge:
+    - knowledge/original/00-INDICE-DP.md
+    - knowledge/original/01-REGRAS-DE-USO-E-LIMITES.md
+    - knowledge/original/02-ADMISSAO-E-CADASTRO.md
+    - knowledge/original/02-ESCOPO-E-ROTEAMENTO.md
+    - knowledge/original/03-FOLHA-PONTO-BENEFICIOS-E-ROTINA-MENSAL.md
+    - knowledge/original/03-FONTES-CANONICAS.md
+    - knowledge/original/04-FERIAS-AFASTAMENTOS-E-OCORRENCIAS.md
+    - knowledge/original/04-SKILLS-E-CENARIOS-DE-USO.md
+    - knowledge/original/05-PERGUNTAS-TESTE-E-RESPOSTAS-ESPERADAS.md
+    - knowledge/original/05-RESCISOES.md
+    - knowledge/original/06-ESOCIAL-SST-E-OBRIGACOES.md
+    - knowledge/original/06-GUARDRAILS-E-CLAIMS-BLOQUEADOS.md
+    - knowledge/original/07-FAQ-E-MODELOS-DE-RESPOSTA.md
+    - knowledge/original/07-MODELOS-DE-RESPOSTA-E-CHECKLISTS.md
+    - knowledge/original/08-LACUNAS-E-ROADMAP.md
+    - knowledge/original/99-FONTES-LACUNAS-E-CONTROLE-DE-VERSAO.md
+  package:
+    - SKILL.md
+    - agent.yaml
+    - agents/openai.yaml
+    - references/source-policy.md
+    - references/dp-outputs.md
+    - references/approval-policy.md
+    - identity/identity.md
+    - identity/soul.md
+    - objectives/mission.md
+    - objectives/non-goals.md
+    - objectives/success-metrics.md
+    - instructions/guardrails.md
+    - instructions/system.md
+    - knowledge/original/00-INDICE-DP.md
+    - knowledge/original/01-REGRAS-DE-USO-E-LIMITES.md
+    - knowledge/original/02-ADMISSAO-E-CADASTRO.md
+    - knowledge/original/02-ESCOPO-E-ROTEAMENTO.md
+    - knowledge/original/03-FOLHA-PONTO-BENEFICIOS-E-ROTINA-MENSAL.md
+    - knowledge/original/03-FONTES-CANONICAS.md
+    - knowledge/original/04-FERIAS-AFASTAMENTOS-E-OCORRENCIAS.md
+    - knowledge/original/04-SKILLS-E-CENARIOS-DE-USO.md
+    - knowledge/original/05-PERGUNTAS-TESTE-E-RESPOSTAS-ESPERADAS.md
+    - knowledge/original/05-RESCISOES.md
+    - knowledge/original/06-ESOCIAL-SST-E-OBRIGACOES.md
+    - knowledge/original/06-GUARDRAILS-E-CLAIMS-BLOQUEADOS.md
+    - knowledge/original/07-FAQ-E-MODELOS-DE-RESPOSTA.md
+    - knowledge/original/07-MODELOS-DE-RESPOSTA-E-CHECKLISTS.md
+    - knowledge/original/08-LACUNAS-E-ROADMAP.md
+    - knowledge/original/99-FONTES-LACUNAS-E-CONTROLE-DE-VERSAO.md
 connectors: []
 evaluations:
   - evaluations/source-capture.md
+  - evaluations/live-editor-audit-2026-09-21.md
+  - evaluations/parity/questions.yaml
   - evaluations/scenarios/T1.md
   - evaluations/scenarios/T2.md
   - evaluations/scenarios/T3.md

@@ -32,12 +32,12 @@ mkdir -p "$fixture/profiles/validation-fixture" \
 printf '%s\n' \
   'schema_version: 1' \
   'name: validation-fixture' \
-  'canonical_agent_version: 0.1.0' \
+  'canonical_agent_version: 0.2.0' \
   > "$fixture/profiles/validation-fixture/profile.yaml"
 printf '%s\n' \
   'schema_version: 1' \
   'name: validation-fixture' \
-  'canonical_agent_version: 0.1.0' \
+  'canonical_agent_version: 0.2.0' \
   'target: validation-fixture' \
   > "$fixture/adapters/validation-fixture/adapter.yaml"
 
