@@ -5,8 +5,8 @@
 | ID | `ac.dp` |
 | Skill | `$ac-dp` |
 | GPT representado | [`g-6a725829fc9c8191a652858f5980d4f4`](https://chatgpt.com/gpts/editor/g-6a725829fc9c8191a652858f5980d4f4) |
-| Versão candidata | `0.2.0` |
-| Lifecycle | `candidate` |
+| Versão | `0.2.0` |
+| Lifecycle | `validated` |
 
 ## O que esta skill faz
 
@@ -50,13 +50,20 @@ A resposta deve entregar trabalho útil no mesmo turno, marcar as lacunas e
 reservar cálculo, prazo, fechamento e pagamento para validação no sistema e por
 responsável qualificado.
 
-## Estado da candidata
+## Validação da release
 
-O pacote estrutural contém uma allowlist de 29 arquivos, incluindo os 16
-documentos de Knowledge, sem symlinks ou placeholders. Os validadores locais
-comprovam integridade, caminhos portáveis e contratos de fonte, privacidade,
-simulação e aprovação. A promoção de `candidate` para `validated` exige a rodada
-independente P1–P6, instalação byte a byte e relatório de comparação final.
+O pacote distribuível contém uma allowlist de 29 arquivos, incluindo os 16
+documentos de Knowledge, sem symlinks ou placeholders. P1–P5 literais
+qualificaram em execução cega e independente com 59/60 pontos e 30/30 gates
+PASS. P6 literal foi suprimido pela plataforma antes de produzir resposta,
+tanto online quanto no runner local; ele não foi classificado como PASS ou
+FAIL. Um cenário substituto semanticamente equivalente qualificou com 12/12 e
+6/6 gates como evidência adicional, sem substituir o teste literal.
+
+A exceção de plataforma foi revisada e aceita para `0.2.0`. A instalação final
+mantém 29 arquivos regulares, 16 arquivos de Knowledge, nenhum symlink e nenhum
+`.gitkeep`, com igualdade byte a byte 29/29. O relatório durável está em
+`evaluations/parity/release-validation-2026-09-21.md`.
 
 Para uso, instalação e manutenção, consulte [HOW-TO-USE.md](HOW-TO-USE.md). A
 evidência do GPT está em

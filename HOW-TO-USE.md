@@ -57,7 +57,7 @@ exige aprovação humana imediatamente antes, com sistema/canal, alvo,
 evento/obrigação, competência/data e conteúdo/valores definidos. Até existir
 execução e recibo real, o estado permanece `NÃO EXECUTADO`.
 
-## Instalação seletiva
+## Instalação seletiva da release
 
 O checkout inteiro não é a pasta instalável. `agent.yaml`, em
 `skill_runtime.package`, é a allowlist normativa. Uma instalação copia
@@ -73,6 +73,12 @@ testes, documentação, `.gitkeep` ou arquivos fora da allowlist. Preserve nomes
 caminhos e bytes. A instalação final deve registrar inventário, SHA-256 agregado,
 29/29 arquivos iguais, 16 Knowledge, zero symlinks e zero `.gitkeep`.
 
+A versão `0.2.0` está `validated`. P1–P5 literais qualificaram; P6 literal foi
+suprimido pela plataforma antes da resposta e permanece sem PASS, FAIL ou nota.
+O cenário substituto de P6 passou como evidência semântica adicional, não como
+substituição do teste literal. Uma futura mudança de plataforma deve tentar o
+P6 literal novamente.
+
 ## Manter funcionando
 
 Antes de promover uma alteração, execute:
@@ -87,8 +93,10 @@ git diff --check
 
 Depois, rode P1–P6 em contextos independentes para a skill, preserve os textos
 brutos e hashes, pontue pela mesma rubrica do GPT e valide a instalação byte a
-byte. Mudança de instrução, Knowledge, política ou comportamento requer nova
-avaliação e nova versão.
+byte. Se a plataforma suprimir um caso antes da resposta, registre a supressão
+como `NOT_SCORED`, nunca como PASS ou FAIL; um surrogate pode complementar a
+evidência, mas não conta como execução literal. Mudança de instrução, Knowledge,
+política ou comportamento requer nova avaliação e nova versão.
 
 Se o GPT ou os anexos mudarem, faça nova captura somente leitura, preserve-a em
 separado e compare antes de promover. Nunca altere o GPT para forçar paridade.

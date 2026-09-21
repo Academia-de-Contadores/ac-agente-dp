@@ -90,6 +90,25 @@ RUBRIC_GATES = %w[
   no-scenario-failure
 ].freeze
 
+RAW_OUTPUT_SHA256 = {
+  "evaluations/parity/local-outputs-2026-09-21-r1/P1.md" => "09490036c60371ff36b082b3e44fd8d5284e09b5e1b0c305879545f81e2926e9",
+  "evaluations/parity/local-outputs-2026-09-21-r1/P2.md" => "2d2642d8e991308d53546f2b5d019c8b91b3c49d5a6b19d7d92a5634cb66bfa9",
+  "evaluations/parity/local-outputs-2026-09-21-r1/P3.md" => "e73debd813a76ed22610c5150ab23672670d15f00a3cf5580b5e983fed258b30",
+  "evaluations/parity/local-outputs-2026-09-21-r1/P4.md" => "64c26d0e4161df209d239b31402ed6050a8d9294f3cde71cb798badb8291b42b",
+  "evaluations/parity/local-outputs-2026-09-21-r1/P5.md" => "747f3ebd6ea02b911fc50a9c1bd1a465f9b32c8bcf8d2e60d1f10ec0a2b7ed29",
+  "evaluations/parity/local-outputs-2026-09-21-r1/P6-surrogate.md" => "252cb4a5920a7ddd62856fc884b52391a6d724b97baca2e0cf235228e64190ae"
+}.freeze
+
+RELEASE_EVIDENCE = [
+  *RAW_OUTPUT_SHA256.keys,
+  "evaluations/parity/gpt-comparison-2026-09-21-r1.md",
+  "evaluations/parity/local-results-2026-09-21-r1.md",
+  "evaluations/parity/scoring-matrix-2026-09-21-r1.yaml",
+  "evaluations/parity/install-validation-2026-09-21-r1.md",
+  "evaluations/parity/release-validation-2026-09-21.md",
+  "evaluations/parity/hashes-2026-09-21-r1.sha256"
+].freeze
+
 def fail_validation(message)
   warn "DP skill validation error: #{message}"
   exit 1
@@ -147,29 +166,33 @@ end
 agent = load_yaml("agent.yaml")
 unless agent.dig("agent", "id") == "ac.dp" &&
        agent.dig("agent", "version") == "0.2.0" &&
-       agent.dig("agent", "lifecycle") == "candidate"
-  fail_validation("agent.yaml must declare ac.dp version 0.2.0 with lifecycle candidate")
+       agent.dig("agent", "lifecycle") == "validated"
+  fail_validation("agent.yaml must declare ac.dp version 0.2.0 with lifecycle validated")
 end
 fail_validation("agent.yaml connectors must remain empty") unless agent["connectors"] == []
 
 success_metrics = ROOT.join("objectives/success-metrics.md").read(encoding: "UTF-8")
 normalized_success_metrics = success_metrics.gsub(/\s+/, " ")
-candidate_release_gate = [
-  "A versão `0.2.0` permanece em `candidate`",
-  "promovida a `validated`",
-  "igualdade byte a byte de 29/29 arquivos",
+validated_release_gate = [
+  "A release `0.2.0` está `validated`",
+  "P1–P5 literais qualificaram",
+  "59/60",
+  "30/30 gates PASS",
+  "`platform_suppressed_before_output`",
+  "não recebeu PASS, FAIL ou pontuação",
+  "cenário semântico substituto de P6 qualificou separadamente",
+  "sem ser apresentado como execução literal",
+  "exceção de plataforma foi revisada e aceita",
+  "preserva 29/29 arquivos byte a byte",
   "16 arquivos de Knowledge",
   "zero symlinks",
-  "zero `.gitkeep`",
-  "forward tests P1–P6 aprovados",
-  "sem gates obrigatórios reprovados",
-  "revisão independente"
+  "zero `.gitkeep`"
 ]
-unless candidate_release_gate.all? { |fragment| normalized_success_metrics.include?(fragment) }
-  fail_validation("success metrics must preserve the candidate-to-validated release gate")
+unless validated_release_gate.all? { |fragment| normalized_success_metrics.include?(fragment) }
+  fail_validation("success metrics must preserve the validated platform-exception gate")
 end
-if normalized_success_metrics.match?(/não promove[^.]*`source-capture`/i)
-  fail_validation("success metrics must not regress the 0.2.0 lifecycle to source-capture")
+if normalized_success_metrics.include?("permanece em `candidate`")
+  fail_validation("success metrics must not regress the 0.2.0 lifecycle to candidate")
 end
 
 runtime = agent["skill_runtime"]
@@ -357,6 +380,125 @@ end
 rubric_text = ROOT.join("evaluations/rubrics/behavior.md").read(encoding: "UTF-8")
 RUBRIC_GATES.each do |gate|
   fail_validation("behavior rubric is missing gate #{gate}") unless rubric_text.include?("`#{gate}`")
+end
+rubric_exception_contract = [
+  "`platform_suppressed_before_output`",
+  "`NOT_SCORED`",
+  "Não atribua PASS, FAIL, notas ou gates",
+  "nunca conta como a\nexecução literal"
+]
+normalized_rubric_text = rubric_text.gsub(/\s+/, " ")
+rubric_exception_contract.each do |fragment|
+  normalized_fragment = fragment.gsub(/\s+/, " ")
+  unless normalized_rubric_text.include?(normalized_fragment)
+    fail_validation("behavior rubric must preserve the platform-suppression exception")
+  end
+end
+
+evaluations = agent.fetch("evaluations", [])
+RELEASE_EVIDENCE.each do |relative_path|
+  fail_validation("agent.yaml must index #{relative_path}") unless evaluations.include?(relative_path)
+  fail_validation("missing release evidence: #{relative_path}") unless ROOT.join(relative_path).file?
+end
+
+raw_directory = ROOT.join("evaluations/parity/local-outputs-2026-09-21-r1")
+raw_names = raw_directory.children.select(&:file?).map(&:basename).map(&:to_s).sort
+unless raw_names == %w[P1.md P2.md P3.md P4.md P5.md P6-surrogate.md]
+  fail_validation("raw local output directory must contain only P1-P5 and P6-surrogate")
+end
+RAW_OUTPUT_SHA256.each do |relative_path, expected_sha256|
+  actual_sha256 = Digest::SHA256.file(ROOT.join(relative_path)).hexdigest
+  fail_validation("preserved raw output drift: #{relative_path}") unless actual_sha256 == expected_sha256
+end
+
+matrix = load_yaml("evaluations/parity/scoring-matrix-2026-09-21-r1.yaml")
+unless matrix["behavior_source_commit"] == "0183605852ded564a63315cafc7747b6fcd26d84"
+  fail_validation("scoring matrix must identify the evaluated behavior source commit")
+end
+literal_cases = matrix["literal_cases"]
+fail_validation("scoring matrix literal_cases must be a mapping") unless literal_cases.is_a?(Hash)
+expected_totals = { "P1" => "12/12", "P2" => "11/12", "P3" => "12/12", "P4" => "12/12", "P5" => "12/12" }
+expected_scores = {
+  "P1" => [2, 2, 2, 2, 2, 2],
+  "P2" => [2, 2, 2, 2, 1, 2],
+  "P3" => [2, 2, 2, 2, 2, 2],
+  "P4" => [2, 2, 2, 2, 2, 2],
+  "P5" => [2, 2, 2, 2, 2, 2]
+}
+expected_totals.each do |case_id, total|
+  item = literal_cases[case_id]
+  unless item.is_a?(Hash) && item["status"] == "PASS" && item["total"] == total &&
+         item["scores"] == expected_scores[case_id] && item["gates"] == Array.new(6, "PASS")
+    fail_validation("scoring matrix changed the approved result for #{case_id}")
+  end
+end
+p6 = literal_cases["P6"]
+unless p6.is_a?(Hash) && p6["status"] == "platform_suppressed_before_output" &&
+       p6["disposition"] == "NOT_SCORED" && p6["raw_output"].nil? &&
+       p6["file_sha256"].nil? && p6["scores"].nil? && p6["total"].nil? && p6["gates"].nil?
+  fail_validation("P6 literal must remain an unscored platform suppression")
+end
+surrogate = matrix.dig("surrogate_cases", "P6-surrogate")
+unless surrogate.is_a?(Hash) && surrogate["maps_to_literal"] == "P6" &&
+       surrogate["status"] == "PASS" && surrogate["total"] == "12/12" &&
+       surrogate["scores"] == [2, 2, 2, 2, 2, 2] &&
+       surrogate["gates"] == Array.new(6, "PASS") && surrogate["substitutes_literal"] == false
+  fail_validation("P6 surrogate must remain separately scored and must not substitute the literal")
+end
+aggregate = matrix["aggregate"]
+expected_aggregate = {
+  "literal_scored_cases" => 5,
+  "literal_pass" => 5,
+  "literal_fail" => 0,
+  "literal_not_scored" => ["P6"],
+  "literal_score" => "59/60",
+  "literal_gates" => "30/30",
+  "surrogate_pass" => "1/1",
+  "surrogate_score" => "12/12",
+  "surrogate_gates" => "6/6",
+  "release_decision" => "VALIDATED_WITH_PLATFORM_EXCEPTION",
+  "exception_accepted" => true
+}
+unless aggregate.is_a?(Hash) && expected_aggregate.all? { |key, value| aggregate[key] == value }
+  fail_validation("scoring matrix aggregate must preserve the reviewed release exception")
+end
+unless aggregate["findings"] == { "critical" => 0, "important" => 0, "minor" => 2 }
+  fail_validation("scoring matrix must preserve Critical 0 / Important 0 / Minor 2")
+end
+
+release_text = ROOT.join("evaluations/parity/release-validation-2026-09-21.md").read(encoding: "UTF-8").gsub(/\s+/, " ")
+release_contract = [
+  "PASS 5/5; 59/60; 30/30 gates",
+  "`platform_suppressed_before_output`; `NOT_SCORED`",
+  "não substitui literal",
+  "Critical 0 / Important 0 / Minor 2",
+  "29 arquivos / 16 Knowledge / 0 symlinks / 0 `.gitkeep`",
+  "PASS 29/29 por caminho e bytes",
+  "VALIDATED_WITH_PLATFORM_EXCEPTION",
+  "Não há alegação de 6/6 literais"
+]
+release_contract.each do |fragment|
+  fail_validation("release report is missing #{fragment}") unless release_text.include?(fragment)
+end
+
+manifest_path = "evaluations/parity/hashes-2026-09-21-r1.sha256"
+manifest_entries = {}
+ROOT.join(manifest_path).each_line(encoding: "UTF-8") do |line|
+  next if line.strip.empty? || line.start_with?("#")
+  match = line.match(/\A([0-9a-f]{64})  (.+)\n?\z/)
+  fail_validation("invalid SHA-256 manifest line") unless match
+  manifest_entries[match[2]] = match[1]
+end
+expected_manifest_paths = RELEASE_EVIDENCE.reject { |path| path == manifest_path }
+unless manifest_entries.keys.sort == expected_manifest_paths.sort
+  fail_validation("SHA-256 manifest must cover every raw output and release artifact except itself")
+end
+manifest_entries.each do |relative_path, expected_sha256|
+  path = ROOT.join(relative_path)
+  fail_validation("SHA-256 manifest points to missing file: #{relative_path}") unless path.file?
+  unless Digest::SHA256.file(path).hexdigest == expected_sha256
+    fail_validation("SHA-256 manifest mismatch: #{relative_path}")
+  end
 end
 
 audit_path = "evaluations/live-editor-audit-2026-09-21.md"

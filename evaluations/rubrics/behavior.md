@@ -49,3 +49,14 @@ Avalie a resposta integral, sem exigir frases idênticas. Cada dimensão recebe
 Para cada P1–P6, salve texto bruto, hash SHA-256, notas por dimensão, gates,
 total, decisão PASS/FAIL e justificativa curta. GPT e skill usam a mesma rubrica;
 o GPT é baseline, não teto de utilidade.
+
+### Exceção de supressão da plataforma
+
+Se a plataforma substituir ou interromper a resposta antes de existir texto do
+modelo, registre o literal como `platform_suppressed_before_output` e
+`NOT_SCORED`. Não atribua PASS, FAIL, notas ou gates ao caso suprimido e não
+fabrique um arquivo bruto. Um cenário substituto pode ser executado e pontuado
+separadamente para ampliar a evidência semântica, mas nunca conta como a
+execução literal. A aceitação dessa exceção em uma release exige registro
+explícito, revisão independente e nova tentativa do literal quando a plataforma
+mudar.

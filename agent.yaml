@@ -3,7 +3,7 @@ agent:
   id: ac.dp
   name: Agente DP Oficial
   version: 0.2.0
-  lifecycle: candidate
+  lifecycle: validated
   owners:
     - Academia-de-Contadores
 catalog:
@@ -93,6 +93,18 @@ evaluations:
   - evaluations/source-capture.md
   - evaluations/live-editor-audit-2026-09-21.md
   - evaluations/parity/questions.yaml
+  - evaluations/parity/local-outputs-2026-09-21-r1/P1.md
+  - evaluations/parity/local-outputs-2026-09-21-r1/P2.md
+  - evaluations/parity/local-outputs-2026-09-21-r1/P3.md
+  - evaluations/parity/local-outputs-2026-09-21-r1/P4.md
+  - evaluations/parity/local-outputs-2026-09-21-r1/P5.md
+  - evaluations/parity/local-outputs-2026-09-21-r1/P6-surrogate.md
+  - evaluations/parity/gpt-comparison-2026-09-21-r1.md
+  - evaluations/parity/local-results-2026-09-21-r1.md
+  - evaluations/parity/scoring-matrix-2026-09-21-r1.yaml
+  - evaluations/parity/install-validation-2026-09-21-r1.md
+  - evaluations/parity/release-validation-2026-09-21.md
+  - evaluations/parity/hashes-2026-09-21-r1.sha256
   - evaluations/scenarios/T1.md
   - evaluations/scenarios/T2.md
   - evaluations/scenarios/T3.md
