@@ -8,5 +8,12 @@ Critérios de regressão derivados da configuração acessível:
 - toda lacuna de dado, versão ou fonte permanece explícita;
 - nenhuma decisão final reservada, execução externa ou evidência inventada é apresentada.
 
-A aprovação destas métricas exige revisão humana de fidelidade; não promove o
-agente além de `source-capture`.
+A versão `0.2.0` permanece em `candidate`. Ela só pode ser promovida a
+`validated` depois de cumprir, em conjunto:
+
+- instalação seletiva construída da allowlist de `skill_runtime.package`, com
+  igualdade byte a byte de 29/29 arquivos, 16 arquivos de Knowledge, zero
+  symlinks e zero `.gitkeep`;
+- forward tests P1–P6 aprovados pela rubrica versionada, sem gates obrigatórios
+  reprovados;
+- revisão independente das evidências e do pacote instalado.

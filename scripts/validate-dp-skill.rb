@@ -152,6 +152,26 @@ unless agent.dig("agent", "id") == "ac.dp" &&
 end
 fail_validation("agent.yaml connectors must remain empty") unless agent["connectors"] == []
 
+success_metrics = ROOT.join("objectives/success-metrics.md").read(encoding: "UTF-8")
+normalized_success_metrics = success_metrics.gsub(/\s+/, " ")
+candidate_release_gate = [
+  "A versão `0.2.0` permanece em `candidate`",
+  "promovida a `validated`",
+  "igualdade byte a byte de 29/29 arquivos",
+  "16 arquivos de Knowledge",
+  "zero symlinks",
+  "zero `.gitkeep`",
+  "forward tests P1–P6 aprovados",
+  "sem gates obrigatórios reprovados",
+  "revisão independente"
+]
+unless candidate_release_gate.all? { |fragment| normalized_success_metrics.include?(fragment) }
+  fail_validation("success metrics must preserve the candidate-to-validated release gate")
+end
+if normalized_success_metrics.match?(/não promove[^.]*`source-capture`/i)
+  fail_validation("success metrics must not regress the 0.2.0 lifecycle to source-capture")
+end
+
 runtime = agent["skill_runtime"]
 fail_validation("agent.yaml skill_runtime must be a mapping") unless runtime.is_a?(Hash)
 RUNTIME_POINTERS.each do |key, expected|

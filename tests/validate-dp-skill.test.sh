@@ -40,6 +40,12 @@ for relative_path in "${required[@]}" "${runtime_knowledge[@]}"; do
   test -f "$root/$relative_path"
 done
 
+if ! grep -Fq '`0.2.0` permanece em `candidate`' \
+  "$root/objectives/success-metrics.md"; then
+  echo "success metrics must describe the 0.2.0 candidate lifecycle" >&2
+  exit 1
+fi
+
 ruby "$validator"
 
 fixture="$(mktemp -d)"
@@ -151,6 +157,12 @@ perl -0pi -e 's/passing_score: 10/passing_score: 9/' \
   "$fixture/evaluations/rubrics/behavior.md"
 expect_rejected "a rubric below the 10 of 12 gate"
 mv "$fixture/rubric.valid" "$fixture/evaluations/rubrics/behavior.md"
+
+cp "$fixture/objectives/success-metrics.md" "$fixture/success-metrics.valid"
+perl -0pi -e 's/`candidate`/`source-capture`/' \
+  "$fixture/objectives/success-metrics.md"
+expect_rejected "success metrics that regress the lifecycle to source-capture"
+mv "$fixture/success-metrics.valid" "$fixture/objectives/success-metrics.md"
 
 cp "$fixture/agent.yaml" "$fixture/agent.yaml.valid"
 sed 's/^  lifecycle: candidate$/  lifecycle: source-capture/' \
