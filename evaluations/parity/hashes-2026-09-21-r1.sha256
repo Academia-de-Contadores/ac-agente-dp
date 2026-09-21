@@ -1,0 +1,20 @@
+# SHA-256 manifest — DP forward validation r1
+# behavior_source_commit: 0183605852ded564a63315cafc7747b6fcd26d84
+# package_inventory_sha256: 62d3060995045c3c80e766f22c792171c2607cfbbf1982784733500434bbd989
+# installed_inventory_sha256: 62d3060995045c3c80e766f22c792171c2607cfbbf1982784733500434bbd989
+# package_regular_files: 29; package_knowledge_files: 16; package_symlinks: 0; package_gitkeep: 0
+# install_regular_files: 29; install_knowledge_files: 16; install_symlinks: 0; install_gitkeep: 0
+# package_install_byte_equality: 29/29
+# Hashes below are whole-file hashes, not scorer response-body hashes.
+# This manifest excludes itself to avoid self-reference.
+09490036c60371ff36b082b3e44fd8d5284e09b5e1b0c305879545f81e2926e9  evaluations/parity/local-outputs-2026-09-21-r1/P1.md
+2d2642d8e991308d53546f2b5d019c8b91b3c49d5a6b19d7d92a5634cb66bfa9  evaluations/parity/local-outputs-2026-09-21-r1/P2.md
+e73debd813a76ed22610c5150ab23672670d15f00a3cf5580b5e983fed258b30  evaluations/parity/local-outputs-2026-09-21-r1/P3.md
+64c26d0e4161df209d239b31402ed6050a8d9294f3cde71cb798badb8291b42b  evaluations/parity/local-outputs-2026-09-21-r1/P4.md
+747f3ebd6ea02b911fc50a9c1bd1a465f9b32c8bcf8d2e60d1f10ec0a2b7ed29  evaluations/parity/local-outputs-2026-09-21-r1/P5.md
+252cb4a5920a7ddd62856fc884b52391a6d724b97baca2e0cf235228e64190ae  evaluations/parity/local-outputs-2026-09-21-r1/P6-surrogate.md
+8604bf192cae82536ec52d0ca6c9139fc437324345901918127d1933faa95169  evaluations/parity/local-results-2026-09-21-r1.md
+bcb5306837f2d403bc528569f30b22cc71fa160736c1a8edbc447c64ecc42b8e  evaluations/parity/gpt-comparison-2026-09-21-r1.md
+d5d9e3a9412eacff73c390a7a1d02234c4a2fba0ca8a5ebe99c758369a5ef51e  evaluations/parity/scoring-matrix-2026-09-21-r1.yaml
+553b43863732e750cc01cc08c602953966b9b37232c576310a82453dd11bd991  evaluations/parity/install-validation-2026-09-21-r1.md
+a5546ad76a4ad5ff7f141084de3b2c8622806f676a4d91f178796f76adde053c  evaluations/parity/release-validation-2026-09-21.md

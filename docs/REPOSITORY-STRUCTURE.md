@@ -8,11 +8,14 @@ controlada dele.
 
 ```text
 .
+├── SKILL.md                    # entrada distribuível da skill ac-dp
 ├── agent.yaml
+├── agents/                     # metadados de interface do harness
+├── references/                 # políticas e formatos lidos sob demanda
 ├── objectives/                 # missão, métricas e não-objetivos
 ├── identity/                   # papel, autoridade, voz e valores
 ├── instructions/               # prompt, guardrails e workflows permanentes
-├── skills/                     # procedimentos acionáveis e suas avaliações
+├── skills/                     # extensões futuras; o entrypoint canônico fica na raiz
 ├── knowledge/                  # fontes curadas disponíveis ao modelo
 ├── connectors/                 # contratos de sistemas externos, Actions e RAG
 ├── adapters/                   # tradução do núcleo para cada plataforma
@@ -106,10 +109,13 @@ use-a somente com manifesto de tipo, alvo, finalidade e dependência.
 
 ## Skills
 
-- **O que é:** `skills/` reúne procedimentos reutilizáveis e acionáveis.
-- **Entra:** `skills/<nome>/SKILL.md` e `skills/<nome>/evaluations/`.
+- **O que é:** `SKILL.md` é o entrypoint distribuível de `$ac-dp`; `agents/`
+  descreve sua interface e `references/` contém políticas carregadas sob
+  demanda. `skills/` fica reservado para extensões subordinadas futuras.
+- **Entra:** o entrypoint raiz, `agents/openai.yaml`, as referências declaradas
+  e, somente quando houver uma extensão real, `skills/<nome>/`.
 - **Não entra:** regra de toda resposta, dado bruto ou credencial.
-- **Exemplo:** `skills/example-skill/SKILL.md` para estruturar briefing.
+- **Exemplo:** `SKILL.md` roteia para `references/dp-outputs.md`.
 - **Avaliação ou revisão:** cada mudança requer cenário direcionado e regressão aplicável.
 
 ## Knowledge

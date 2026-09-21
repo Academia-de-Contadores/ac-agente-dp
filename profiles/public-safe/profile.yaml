@@ -1,6 +1,6 @@
 schema_version: 1
 name: public-safe
-canonical_agent_version: 0.1.0
+canonical_agent_version: 0.2.0
 purpose: Distribuição pública com orientação geral, checklist e encaminhamento para revisão humana.
 restrictions:
   - Não realizar cálculo ou apuração final.

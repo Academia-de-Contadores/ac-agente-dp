@@ -8,4 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: bash scripts/validate-agent-repo.sh
+      - name: Validate canonical repository
+        run: bash tests/validate-agent-repo.test.sh
+      - name: Validate distributable DP skill
+        run: bash tests/validate-dp-skill.test.sh

@@ -1,5 +1,9 @@
 # Ficha de captura da fonte
 
+> Registro histórico da captura inicial. A reconciliação vigente, incluindo
+> modelo, capacidades, paridade das instruções, Knowledge 16/16 e baseline
+> P1–P6, está em `evaluations/live-editor-audit-2026-09-21.md`.
+
 - **source_status:** accessible
 - **data da captura:** 2026-08-06
 - **URL exata do editor/fonte:** https://chatgpt.com/gpts/editor/g-6a725829fc9c8191a652858f5980d4f4
