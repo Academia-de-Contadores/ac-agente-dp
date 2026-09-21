@@ -14,6 +14,12 @@ required=(
   evaluations/live-editor-audit-2026-09-21.md
   evaluations/parity/questions.yaml
   evaluations/rubrics/behavior.md
+  evaluations/parity/gpt-comparison-2026-09-21-r1.md
+  evaluations/parity/local-results-2026-09-21-r1.md
+  evaluations/parity/scoring-matrix-2026-09-21-r1.yaml
+  evaluations/parity/install-validation-2026-09-21-r1.md
+  evaluations/parity/release-validation-2026-09-21.md
+  evaluations/parity/hashes-2026-09-21-r1.sha256
   scripts/validate-dp-skill.rb
 )
 
@@ -40,9 +46,9 @@ for relative_path in "${required[@]}" "${runtime_knowledge[@]}"; do
   test -f "$root/$relative_path"
 done
 
-if ! grep -Fq '`0.2.0` permanece em `candidate`' \
+if ! grep -Fq 'A release `0.2.0` está `validated`' \
   "$root/objectives/success-metrics.md"; then
-  echo "success metrics must describe the 0.2.0 candidate lifecycle" >&2
+  echo "success metrics must describe the validated 0.2.0 lifecycle" >&2
   exit 1
 fi
 
@@ -159,16 +165,31 @@ expect_rejected "a rubric below the 10 of 12 gate"
 mv "$fixture/rubric.valid" "$fixture/evaluations/rubrics/behavior.md"
 
 cp "$fixture/objectives/success-metrics.md" "$fixture/success-metrics.valid"
-perl -0pi -e 's/`candidate`/`source-capture`/' \
+perl -0pi -e 's/`validated`/`candidate`/' \
   "$fixture/objectives/success-metrics.md"
-expect_rejected "success metrics that regress the lifecycle to source-capture"
+expect_rejected "success metrics that regress the validated lifecycle"
 mv "$fixture/success-metrics.valid" "$fixture/objectives/success-metrics.md"
 
 cp "$fixture/agent.yaml" "$fixture/agent.yaml.valid"
-sed 's/^  lifecycle: candidate$/  lifecycle: source-capture/' \
+sed 's/^  lifecycle: validated$/  lifecycle: candidate/' \
   "$fixture/agent.yaml.valid" > "$fixture/agent.yaml"
-expect_rejected "a lifecycle regression from candidate"
+expect_rejected "a lifecycle regression from validated"
 mv "$fixture/agent.yaml.valid" "$fixture/agent.yaml"
+
+cp "$fixture/evaluations/parity/scoring-matrix-2026-09-21-r1.yaml" \
+  "$fixture/scoring-matrix.valid"
+perl -0pi -e 's/platform_suppressed_before_output/PASS/' \
+  "$fixture/evaluations/parity/scoring-matrix-2026-09-21-r1.yaml"
+expect_rejected "a P6 literal suppression mislabeled as PASS"
+mv "$fixture/scoring-matrix.valid" \
+  "$fixture/evaluations/parity/scoring-matrix-2026-09-21-r1.yaml"
+
+cp "$fixture/evaluations/parity/local-outputs-2026-09-21-r1/P1.md" \
+  "$fixture/P1.valid"
+printf x >> "$fixture/evaluations/parity/local-outputs-2026-09-21-r1/P1.md"
+expect_rejected "a changed preserved raw local output"
+mv "$fixture/P1.valid" \
+  "$fixture/evaluations/parity/local-outputs-2026-09-21-r1/P1.md"
 
 cp "$fixture/agents/openai.yaml" "$fixture/openai.yaml.valid"
 printf '%s\n' 'dependencies:' '  tools:' '    - type: "mcp"' \
